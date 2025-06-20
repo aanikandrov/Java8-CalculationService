@@ -38,7 +38,7 @@ public class AlcoholCalculatorController {
 
     private DrinkEquivalent calculateDrink(String name, double strength, double alcoholGrams) {
         double ethanolDensity = 0.78924; // г/мл
-        double volumeMl = (alcoholGrams * 100) / (strength * ethanolDensity);
-        return new DrinkEquivalent(name, Math.round(volumeMl * 10.0) / 10.0); // округление до 0.1
+        double ml = (alcoholGrams * 100) / (strength * ethanolDensity);
+        return new DrinkEquivalent(name, Math.round(ml * 10.0) / 10.0);
     }
 }
