@@ -1,0 +1,2 @@
+curl -X POST http://localhost:8080/api/alcohol/calculate -H "Content-Type: application/json" -d "{\"weight\":80,\"age\":20,\"gender\":true,\"height\":180,\"personalConst\":0.3,\"desiredPromille\":1.0}"
+
