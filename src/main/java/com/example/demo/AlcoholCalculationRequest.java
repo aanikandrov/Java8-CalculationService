@@ -1,12 +1,28 @@
 package com.example.demo;
 
+import javax.validation.constraints.*;
+
 public class AlcoholCalculationRequest {
+
+    @Positive(message = "Вес должен быть положительным числом")
     private double weight;          // Вес в кг
+
+    @Min(value = 18, message = "Минимальный возраст 18 лет")
     private int age;                // Возраст
-    private boolean gender;          // Пол (MALE/FEMALE)
+
+    // к гендеру ограничений нет))
+    private boolean gender;         // Пол (MALE/FEMALE)
+    @Positive(message = "Рост должен быть положительным числом")
     private double height;          // Рост в см
+
+    // TODO понять как учитывать
     private double personalConst;   // Персональная константа
+    @DecimalMin(value = "0.0", message = "Промилле не может быть отрицательным")
     private double desiredPromille; // Желаемое промилле
+
+    //    @Min(value = 0, message = "Количество часов не может быть отрицательным")
+    //    private Integer hours;          // Часы до выведения алкоголя
+    //    // null если не указано
 
     public double getWeight() {
         return weight;
@@ -55,4 +71,12 @@ public class AlcoholCalculationRequest {
     public void setDesiredPromille(double desiredPromille) {
         this.desiredPromille = desiredPromille;
     }
+
+//    public Integer getHours() {
+//        return hours;
+//    }
+//
+//    public void setHours(Integer hours) {
+//        this.hours = hours;
+//    }
 }

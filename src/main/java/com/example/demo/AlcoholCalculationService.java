@@ -9,12 +9,13 @@ public class AlcoholCalculationService {
 
     public AlcoholCalculationResponse calculate(AlcoholCalculationRequest request) {
         // Коэффициент распределения Видмарка
-        double r = request.getGender() ? 0.7 : 0.6;
+        double r = request.getGender() ? Constants.MALE_COEFFICIENT : Constants.FEMALE_COEFFICIENT;
 
         // Расчёт массы чистого спирта (граммы)
         double adjustedPromille = request.getDesiredPromille() - request.getPersonalConst();
         double pureAlcoholGrams = Math.max(0, adjustedPromille) * request.getWeight() * r;
 
+        // TODO заменить на БД !!!
         // Рассчёт эквивалентов напитков
         List<DrinkEquivalent> equivalents = Arrays.asList(
                 calculateDrink("Пиво", 5.0, pureAlcoholGrams),
@@ -27,8 +28,7 @@ public class AlcoholCalculationService {
     }
 
     private DrinkEquivalent calculateDrink(String name, double strength, double alcoholGrams) {
-        double ethanolDensity = 0.78924; // г/мл
-        double ml = (alcoholGrams * 100) / (strength * ethanolDensity);
+        double ml = (alcoholGrams * 100) / (strength * Constants.ETHANOL_DENSITY);
         return new DrinkEquivalent(name, Math.round(ml * 10.0) / 10.0);
     }
 }
