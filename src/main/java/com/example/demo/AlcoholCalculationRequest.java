@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import javax.validation.constraints.*;
+import com.example.demo.Satiety;
 
 public class AlcoholCalculationRequest {
 
@@ -10,10 +11,14 @@ public class AlcoholCalculationRequest {
     @Min(value = 18, message = "Минимальный возраст 18 лет")
     private int age;                // Возраст
 
-    // к гендеру ограничений нет))
-    private boolean gender;         // Пол (MALE/FEMALE)
+    @NotBlank(message = "Пол обязателен")
+    @Pattern(regexp = "MALE|FEMALE", message = "Пол должен быть MALE или FEMALE")
+    private String gender;
     @Positive(message = "Рост должен быть положительным числом")
     private double height;          // Рост в см
+
+    @NotNull(message = "Уровень сытости обязателен")
+    private Satiety satiety;
 
     // TODO понять как учитывать
     private double personalConst;   // Персональная константа
@@ -40,12 +45,20 @@ public class AlcoholCalculationRequest {
         this.age = age;
     }
 
-    public boolean getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(boolean gender) {
+    public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Satiety getSatiety() {
+        return satiety;
+    }
+
+    public void setSatiety(Satiety satiety) {
+        this.satiety = satiety;
     }
 
     public double getHeight() {
