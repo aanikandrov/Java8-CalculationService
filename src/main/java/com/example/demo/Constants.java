@@ -17,10 +17,7 @@ public class Constants {
     static final double NORMAL_COEFF = 0.8;
     static final double FULL_COEFF = 0.6;
 
-
     // ИМТ-границы
     static final double UNDERWEIGHT_BMI = 18.5;
     static final double OVERWEIGHT_BMI = 25.0;
-
-
 }
