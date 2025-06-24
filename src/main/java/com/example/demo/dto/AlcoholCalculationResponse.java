@@ -1,17 +1,17 @@
 package com.example.demo.dto;
 
-import com.example.demo.DrinkEquivalent;
+import com.example.demo.CombinationVariant;
 
 import java.util.List;
 
 public class AlcoholCalculationResponse {
 
     private double pureAlcoholGrams;
-    private List<DrinkEquivalent> equivalents;
+    private List<CombinationVariant> variants;
 
-    public AlcoholCalculationResponse(double pureAlcoholGrams, List<DrinkEquivalent> equivalents) {
+    public AlcoholCalculationResponse(double pureAlcoholGrams, List<CombinationVariant> variants) {
         this.pureAlcoholGrams = pureAlcoholGrams;
-        this.equivalents = equivalents;
+        this.variants = variants;
     }
 
     public double getPureAlcoholGrams() {
@@ -22,11 +22,11 @@ public class AlcoholCalculationResponse {
         this.pureAlcoholGrams = pureAlcoholGrams;
     }
 
-    public List<DrinkEquivalent> getEquivalents() {
-        return equivalents;
+    public List<CombinationVariant> getVariants() {
+        return variants;
     }
 
-    public void setEquivalents(List<DrinkEquivalent> equivalents) {
-        this.equivalents = equivalents;
+    public void setVariants(List<CombinationVariant> variants) {
+        this.variants = variants;
     }
 }

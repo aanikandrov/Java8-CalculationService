@@ -2,6 +2,12 @@ package com.example.demo;
 
 public class Constants {
 
+    // Количество возвращаемых вариантов
+    static final public int MAX_VARIANTS = 7;
+
+    // Макс напитков в комбинации
+    static final public int MAX_DRINKS_PER_VARIANT = 3;
+
     // Скорость вывода алкоголя (промилле в час)
     static final public double ALCOHOL_ELIMINATION_RATE = 0.15;
 
