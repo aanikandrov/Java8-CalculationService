@@ -4,6 +4,7 @@ import com.example.demo.dto.AlcoholCalculationRequest;
 import com.example.demo.dto.AlcoholCalculationResponse;
 import com.example.demo.Constants;
 import com.example.demo.DrinkEquivalent;
+import com.example.demo.dto.Drink;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +42,7 @@ public class AlcoholCalculationService {
 
         // 6. Округление и расчёт эквивалентов
         double roundedGrams = Math.round(pureAlcoholGrams * 10) / 10.0;
-        List<DrinkEquivalent> equivalents = calculateEquivalents(roundedGrams);
+        List<DrinkEquivalent> equivalents = calculateEquivalents(roundedGrams, request.getDrinks());
 
         return new AlcoholCalculationResponse(roundedGrams, equivalents);
     }
@@ -56,12 +57,10 @@ public class AlcoholCalculationService {
     }
 
     // TODO вынести в БД
-    private List<DrinkEquivalent> calculateEquivalents(double alcoholGrams) {
-        return Arrays.asList(
-                calculateDrink("Пиво", 5.0, alcoholGrams),
-                calculateDrink("Вино", 12.0, alcoholGrams),
-                calculateDrink("Водка", 40.0, alcoholGrams)
-        );
+    private List<DrinkEquivalent> calculateEquivalents(double alcoholGrams, List<Drink> drinks) {
+        return drinks.stream()
+                .map(drink -> calculateDrink(drink.getDrinkName(), drink.getDrinkValue(), alcoholGrams))
+                .toList();
     }
 
     private DrinkEquivalent calculateDrink(String name, double strength, double alcoholGrams) {

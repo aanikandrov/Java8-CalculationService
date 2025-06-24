@@ -2,6 +2,7 @@ package com.example.demo.dto;
 
 import javax.validation.constraints.*;
 import com.example.demo.Satiety;
+import java.util.List;
 
 public class AlcoholCalculationRequest {
 
@@ -28,6 +29,9 @@ public class AlcoholCalculationRequest {
     //    @Min(value = 0, message = "Количество часов не может быть отрицательным")
     //    private Integer hours;          // Часы до выведения алкоголя
     //    // null если не указано
+
+    @NotEmpty(message = "Список напитков не может быть пустым")
+    private List<Drink> drinks;
 
     public double getWeight() {
         return weight;
@@ -92,4 +96,12 @@ public class AlcoholCalculationRequest {
 //    public void setHours(Integer hours) {
 //        this.hours = hours;
 //    }
+
+    public List<Drink> getDrinks() {
+        return drinks;
+    }
+
+    public void setDrinks(List<Drink> drinks) {
+        this.drinks = drinks;
+    }
 }
