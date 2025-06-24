@@ -9,11 +9,23 @@ public class AlcoholCalculationService {
 
     public AlcoholCalculationResponse calculate(AlcoholCalculationRequest request) {
         // Коэффициент распределения Видмарка
-        double r = request.getGender() ? Constants.MALE_COEFFICIENT : Constants.FEMALE_COEFFICIENT;
+        double r = "MALE".equals(request.getGender()) ?
+                Constants.MALE_COEFFICIENT :
+                Constants.FEMALE_COEFFICIENT;
+
+        // Определение коэффициента сытости
+        double satietyCoeff = switch (request.getSatiety()) {
+            case HUNGRY -> Constants.HUNGRY_COEFF;
+            case NORMAL -> Constants.NORMAL_COEFF;
+            case FULL -> Constants.FULL_COEFF;
+        };
 
         // Расчёт массы чистого спирта (граммы)
         double adjustedPromille = request.getDesiredPromille() - request.getPersonalConst();
-        double pureAlcoholGrams = Math.max(0, adjustedPromille) * request.getWeight() * r;
+        double pureAlcoholGrams = Math.max(0, adjustedPromille) *
+                request.getWeight() *
+                r *
+                satietyCoeff;
 
         // TODO заменить на БД !!!
         // Рассчёт эквивалентов напитков
