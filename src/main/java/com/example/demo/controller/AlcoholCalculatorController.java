@@ -1,5 +1,8 @@
-package com.example.demo;
+package com.example.demo.controller;
 
+import com.example.demo.dto.AlcoholCalculationRequest;
+import com.example.demo.dto.AlcoholCalculationResponse;
+import com.example.demo.service.AlcoholCalculationService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

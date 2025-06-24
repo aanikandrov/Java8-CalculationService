@@ -1,4 +1,6 @@
-package com.example.demo;
+package com.example.demo.dto;
+
+import com.example.demo.DrinkEquivalent;
 
 import java.util.List;
 

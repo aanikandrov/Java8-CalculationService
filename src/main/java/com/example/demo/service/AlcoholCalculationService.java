@@ -1,5 +1,9 @@
-package com.example.demo;
+package com.example.demo.service;
 
+import com.example.demo.dto.AlcoholCalculationRequest;
+import com.example.demo.dto.AlcoholCalculationResponse;
+import com.example.demo.Constants;
+import com.example.demo.DrinkEquivalent;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;

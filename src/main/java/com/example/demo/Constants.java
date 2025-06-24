@@ -3,21 +3,21 @@ package com.example.demo;
 public class Constants {
 
     // Скорость вывода алкоголя (промилле в час)
-    static final double ALCOHOL_ELIMINATION_RATE = 0.15;
+    static final public double ALCOHOL_ELIMINATION_RATE = 0.15;
 
     // Коэффициенты для формулы Видмарка
-    static final double MALE_COEFFICIENT = 0.7;
-    static final double FEMALE_COEFFICIENT = 0.6;
+    static final public double MALE_COEFFICIENT = 0.7;
+    static final public double FEMALE_COEFFICIENT = 0.6;
 
     // Плотность этанола (г/мл)
-    static final double ETHANOL_DENSITY = 0.78924;
+    static final public double ETHANOL_DENSITY = 0.78924;
 
     // Коэффициенты сытости
-    static final double HUNGRY_COEFF = 1.0;
-    static final double NORMAL_COEFF = 0.8;
-    static final double FULL_COEFF = 0.6;
+    static final public double HUNGRY_COEFF = 1.0;
+    static final public double NORMAL_COEFF = 0.8;
+    static final public double FULL_COEFF = 0.6;
 
     // ИМТ-границы
-    static final double UNDERWEIGHT_BMI = 18.5;
-    static final double OVERWEIGHT_BMI = 25.0;
+    static final public double UNDERWEIGHT_BMI = 18.5;
+    static final public double OVERWEIGHT_BMI = 25.0;
 }
