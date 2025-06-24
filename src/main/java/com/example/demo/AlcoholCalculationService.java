@@ -8,35 +8,56 @@ import java.util.List;
 public class AlcoholCalculationService {
 
     public AlcoholCalculationResponse calculate(AlcoholCalculationRequest request) {
-        // Коэффициент распределения Видмарка
+        // 1. Расчёт ИМТ
+        double heightMeters = request.getHeight() / 100;
+        double bmi = request.getWeight() / (heightMeters * heightMeters);
+
+        // 2. Поправочный коэффициент на основе ИМТ
+        double bmiFactor = calculateBmiFactor(bmi);
+
+        // 3. Коэффициент Видмарка
         double r = "MALE".equals(request.getGender()) ?
                 Constants.MALE_COEFFICIENT :
                 Constants.FEMALE_COEFFICIENT;
 
-        // Определение коэффициента сытости
+        // 4. Коэффициент сытости
         double satietyCoeff = switch (request.getSatiety()) {
             case HUNGRY -> Constants.HUNGRY_COEFF;
             case NORMAL -> Constants.NORMAL_COEFF;
-            case FULL -> Constants.FULL_COEFF;
+            case FULL   -> Constants.FULL_COEFF;
         };
 
-        // Расчёт массы чистого спирта (граммы)
+        // 5. Расчёт массы чистого спирта с учётом всех коэффициентов
         double adjustedPromille = request.getDesiredPromille() - request.getPersonalConst();
-        double pureAlcoholGrams = Math.max(0, adjustedPromille) *
-                request.getWeight() *
-                r *
-                satietyCoeff;
+        double pureAlcoholGrams = Math.max(0, adjustedPromille)
+                * request.getWeight()
+                * r
+                * satietyCoeff
+                * bmiFactor;
 
-        // TODO заменить на БД !!!
-        // Рассчёт эквивалентов напитков
-        List<DrinkEquivalent> equivalents = Arrays.asList(
-                calculateDrink("Пиво", 5.0, pureAlcoholGrams),
-                calculateDrink("Вино", 12.0, pureAlcoholGrams),
-                calculateDrink("Водка", 40.0, pureAlcoholGrams)
+        // 6. Округление и расчёт эквивалентов
+        double roundedGrams = Math.round(pureAlcoholGrams * 10) / 10.0;
+        List<DrinkEquivalent> equivalents = calculateEquivalents(roundedGrams);
+
+        return new AlcoholCalculationResponse(roundedGrams, equivalents);
+    }
+
+    private double calculateBmiFactor(double bmi) {
+        if (bmi < Constants.UNDERWEIGHT_BMI) {
+            return 0.9;   // Недостаточный вес
+        } else if (bmi > Constants.OVERWEIGHT_BMI) {
+            return 1.1;  // Избыточный вес
+        }
+        return 1.0;      // Нормальный вес
+    }
+
+    // TODO вынести в БД
+    private List<DrinkEquivalent> calculateEquivalents(double alcoholGrams) {
+        return Arrays.asList(
+                calculateDrink("Пиво", 5.0, alcoholGrams),
+                calculateDrink("Вино", 12.0, alcoholGrams),
+                calculateDrink("Водка", 40.0, alcoholGrams)
         );
-
-        double roundedAlcohol = Math.round(pureAlcoholGrams * 10) / 10.0;
-        return new AlcoholCalculationResponse(roundedAlcohol, equivalents);
     }
 
     private DrinkEquivalent calculateDrink(String name, double strength, double alcoholGrams) {
