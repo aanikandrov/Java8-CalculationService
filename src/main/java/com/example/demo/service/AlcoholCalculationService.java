@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,6 +38,10 @@ public class AlcoholCalculationService {
         allDrinks.addAll(userSavedDrinks);
 
         List<Alcohol> availableDrinks = new ArrayList<>(allDrinks);
+
+        // Создаем карту для быстрого доступа к крепости напитка по имени
+        Map<String, Double> drinkStrengthMap = availableDrinks.stream()
+                .collect(Collectors.toMap(Alcohol::getName, Alcohol::getDegree));
 
         log.info("Found {} available drinks for user: {}", availableDrinks.size(),
                 availableDrinks.stream().map(Alcohol::getName).collect(Collectors.joining(", ")));
@@ -71,7 +76,7 @@ public class AlcoholCalculationService {
         log.debug("Satiety coefficient: {}", satietyCoeff);
 
         // 5. Расчёт массы чистого спирта
-        double userConst = user.getPersonalConst() != null ? user.getPersonalConst() : 0.0;
+        double userConst = Optional.ofNullable(user.getPersonalConst()).orElse(0.0);
         double adjustedPromille = request.getDesiredPromille() + userConst;
 
         double pureAlcoholGrams = Math.max(0, adjustedPromille)
@@ -88,7 +93,8 @@ public class AlcoholCalculationService {
         List<CombinationVariant> variants = generateUniqueCombinationVariants(
                 roundedGrams,
                 availableDrinks,
-                Constants.MAX_VARIANTS
+                Constants.MAX_VARIANTS,
+                drinkStrengthMap  // Передаем карту крепостей
         );
 
         log.info("Generated {} combination variants:", variants.size());
@@ -97,23 +103,92 @@ public class AlcoholCalculationService {
         return new AlcoholCalculationResponse(roundedGrams, variants);
     }
 
-    private CombinationVariant createVariant(double alcoholGrams, List<Alcohol> drinks) {
+    // Округление до "красивого" значения
+    private double roundToNiceValue(double ml) {
+        if (ml < 10) {
+            // Для маленьких объемов оставляем 1 знак после запятой
+            return Math.round(ml * 10) / 10.0;
+        } else if (ml < 50) {
+            // Для средних объемов округляем до кратного 5 мл
+            return Math.round(ml / 5) * 5;
+        } else {
+            // Для больших объемов округляем до кратного 10 мл
+            return Math.round(ml / 10) * 10;
+        }
+    }
+
+    // Компенсация разницы в количестве спирта
+    private void compensateDifference(List<DrinkEquivalent> equivalents, double diff,
+                                      Map<String, Double> drinkStrengthMap) {
+        if (equivalents.isEmpty()) return;
+
+        // Находим напиток с максимальной крепостью для минимальной коррекции
+        DrinkEquivalent strongestDrink = null;
+        double maxStrength = 0;
+        for (DrinkEquivalent eq : equivalents) {
+            double strength = drinkStrengthMap.getOrDefault(eq.getDrinkName(), 40.0);
+            if (strength > maxStrength) {
+                maxStrength = strength;
+                strongestDrink = eq;
+            }
+        }
+
+        if (strongestDrink == null) return;
+
+        double strength = maxStrength;
+        double density = Constants.ETHANOL_DENSITY;
+
+        // Рассчитываем необходимую коррекцию в мл
+        double mlAdjustment = diff / ((strength / 100) * density);
+        double newMl = strongestDrink.getMl() + mlAdjustment;
+
+        // Округляем скорректированное значение
+        strongestDrink.setMl(roundToNiceValue(newMl));
+    }
+
+    private CombinationVariant createVariant(double alcoholGrams, List<Alcohol> drinks,
+                                             Map<String, Double> drinkStrengthMap) {
         log.debug("Creating variant with {}g alcohol for {} drinks", alcoholGrams, drinks.size());
 
         double portion = alcoholGrams / drinks.size();
         List<DrinkEquivalent> equivalents = drinks.stream()
                 .map(drink -> {
-                    double ml = (portion * 100) / (drink.getDegree() * Constants.ETHANOL_DENSITY);
-                    double roundedMl = Math.round(ml * 10.0) / 10.0;
-                    log.trace("Drink: {}, degree: {}, calculated ml: {} (rounded: {})",
-                            drink.getName(), drink.getDegree(), ml, roundedMl);
-                    return new DrinkEquivalent(drink.getName(), roundedMl);
+                    double exactMl = (portion * 100) / (drink.getDegree() * Constants.ETHANOL_DENSITY);
+                    return new DrinkEquivalent(drink.getName(), exactMl);
                 })
                 .collect(Collectors.toList());
+
+        // Рассчитываем общее количество спирта для проверки
+        double totalAlcohol = equivalents.stream()
+                .mapToDouble(eq -> {
+                    double strength = drinkStrengthMap.getOrDefault(eq.getDrinkName(), 40.0);
+                    return eq.getMl() * (strength / 100) * Constants.ETHANOL_DENSITY;
+                })
+                .sum();
+
+        // Округляем объемы до красивых значений
+        equivalents.forEach(eq -> {
+            double rounded = roundToNiceValue(eq.getMl());
+            eq.setMl(rounded);
+        });
+
+        // Корректируем для сохранения общего количества спирта
+        double newTotalAlcohol = equivalents.stream()
+                .mapToDouble(eq -> {
+                    double strength = drinkStrengthMap.getOrDefault(eq.getDrinkName(), 40.0);
+                    return eq.getMl() * (strength / 100) * Constants.ETHANOL_DENSITY;
+                })
+                .sum();
+
+        double diff = totalAlcohol - newTotalAlcohol;
+        if (Math.abs(diff) > 0.1) {
+            compensateDifference(equivalents, diff, drinkStrengthMap);
+        }
 
         return new CombinationVariant(equivalents);
     }
 
+    // Остальные методы без изменений
     private void generateCombinations(
             List<CombinationVariant> variants,
             Set<Set<String>> seenCombinations,
@@ -121,7 +196,8 @@ public class AlcoholCalculationService {
             List<Alcohol> drinks,
             int start,
             int k,
-            double alcoholGrams
+            double alcoholGrams,
+            Map<String, Double> drinkStrengthMap
     ) {
         if (k == 0) {
             Set<String> key = current.stream()
@@ -130,7 +206,7 @@ public class AlcoholCalculationService {
 
             if (!seenCombinations.contains(key)) {
                 log.debug("Adding new combination: {}", key);
-                variants.add(createVariant(alcoholGrams, new ArrayList<>(current)));
+                variants.add(createVariant(alcoholGrams, new ArrayList<>(current), drinkStrengthMap));
                 seenCombinations.add(key);
             } else {
                 log.debug("Combination already exists: {}", key);
@@ -140,7 +216,7 @@ public class AlcoholCalculationService {
 
         for (int i = start; i < drinks.size(); i++) {
             current.add(drinks.get(i));
-            generateCombinations(variants, seenCombinations, current, drinks, i + 1, k - 1, alcoholGrams);
+            generateCombinations(variants, seenCombinations, current, drinks, i + 1, k - 1, alcoholGrams, drinkStrengthMap);
             current.remove(current.size() - 1);
         }
     }
@@ -148,7 +224,8 @@ public class AlcoholCalculationService {
     private List<CombinationVariant> generateUniqueCombinationVariants(
             double alcoholGrams,
             List<Alcohol> drinks,
-            int maxVariants
+            int maxVariants,
+            Map<String, Double> drinkStrengthMap
     ) {
         log.info("Generating variants for {}g alcohol from {} drinks (max variants: {})",
                 alcoholGrams, drinks.size(), maxVariants);
@@ -173,7 +250,8 @@ public class AlcoholCalculationService {
                     drinks,
                     0,
                     i,
-                    alcoholGrams
+                    alcoholGrams,
+                    drinkStrengthMap
             );
 
             if (variants.size() >= maxVariants) {
@@ -185,7 +263,6 @@ public class AlcoholCalculationService {
         log.info("Total variants generated: {}", variants.size());
         return variants.stream().limit(maxVariants).collect(Collectors.toList());
     }
-
 
     private double calculateBmiFactor(double bmi) {
         if (bmi < Constants.UNDERWEIGHT_BMI) {
