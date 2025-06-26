@@ -35,7 +35,9 @@ public class UserService {
                 });
 
         double delta = calculateDelta(request.getCategory());
-        double newConst = calculateNewPersonalConst(user.getPersonalConst(), delta);
+        double newConst = user.getPersonalConst() + delta;
+
+        newConst = Math.max(-2.0, Math.min(2.0, newConst));
 
         user.setPersonalConst(newConst);
         userRepository.save(user);
@@ -45,10 +47,12 @@ public class UserService {
     }
 
     private double calculateDelta(String category) {
-        return switch (category) {
-            case "Not enough", "Too little" -> 0.1;
-            case "A lot", "Too much" -> -0.1;
-            case "Just right" -> 0.0;
+        return switch (category.toLowerCase()) {
+            case "too little" -> 0.2;
+            case "not enough" -> 0.1;
+            case "a lot" -> -0.1;
+            case "too much" -> -0.2;
+            case "just right" -> 0.0;
             default -> throw new IllegalArgumentException("Invalid category: " + category);
         };
     }
@@ -57,7 +61,6 @@ public class UserService {
         double baseValue = (currentConst != null) ? currentConst : 0.7;
         double newValue = baseValue + delta;
 
-        // Ограничиваем значение в диапазоне [0.0, 2.0]
         return Math.max(0.0, Math.min(2.0, newValue));
     }
 }

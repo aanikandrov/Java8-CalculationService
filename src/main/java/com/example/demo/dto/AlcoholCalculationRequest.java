@@ -1,12 +1,9 @@
 package com.example.demo.dto;
 
 
-import com.example.demo.Satiety;
-import com.example.demo.entity.Alcohol;
+import com.example.demo.enums.Satiety;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter

@@ -71,10 +71,8 @@ public class AlcoholCalculationService {
         log.debug("Satiety coefficient: {}", satietyCoeff);
 
         // 5. Расчёт массы чистого спирта
-        double adjustedPromille = request.getDesiredPromille() - user.getPersonalConst();
-
-        //double userConst = user.getPersonalConst() != null ? user.getPersonalConst() : 0.0;
-        //double adjustedPromille = request.getDesiredPromille() - userConst;
+        double userConst = user.getPersonalConst() != null ? user.getPersonalConst() : 0.0;
+        double adjustedPromille = request.getDesiredPromille() + userConst;
 
         double pureAlcoholGrams = Math.max(0, adjustedPromille)
                 * request.getWeight()
