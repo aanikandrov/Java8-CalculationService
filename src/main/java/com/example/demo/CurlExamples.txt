@@ -3,4 +3,4 @@ curl -X POST "http://localhost:8080/api/alcohol/calculate" -H "Content-Type: app
 
 
 
-curl -X POST "http://localhost:8080/api/user/update-const" -H "Content-Type: application/json" -d "{\"userId\": 8, \"category\": \"Not enough\"}"
+curl -X POST "http://localhost:8080/api/user/update-const" -H "Content-Type: application/json" -d "{\"userId\":8,\"feedback\":\"A_LOT\"}"

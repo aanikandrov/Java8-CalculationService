@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.FeedbackUpdateRequest;
+import com.example.demo.dto.FeedbackRequest;
 import com.example.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ public class UserController {
 
     @PostMapping("/update-const")
     public ResponseEntity<Void> updatePersonalConst(
-            @RequestBody FeedbackUpdateRequest request) {
+            @RequestBody FeedbackRequest request) {
         userService.updatePersonalConst(request);
         return ResponseEntity.ok().build();
     }

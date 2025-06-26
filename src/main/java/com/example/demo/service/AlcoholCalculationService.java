@@ -208,9 +208,4 @@ public class AlcoholCalculationService {
         }
         return 1.0;      // Нормальный вес
     }
-
-    private double calculateDrinkVolume(double strength, double alcoholGrams) {
-        double ml = (alcoholGrams * 100) / (strength * Constants.ETHANOL_DENSITY);
-        return Math.round(ml * 10.0) / 10.0; // Округление до 0.1 мл
-    }
 }
