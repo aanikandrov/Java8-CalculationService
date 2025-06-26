@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.enums;
 
 public enum Satiety {
     HUNGRY, NORMAL, FULL
