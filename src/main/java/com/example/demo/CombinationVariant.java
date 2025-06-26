@@ -1,14 +1,14 @@
 package com.example.demo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CombinationVariant {
-    private List<DrinkEquivalent> drinks;
-
-    public CombinationVariant(List<DrinkEquivalent> drinks) {
-        this.drinks = drinks;
-    }
+    private List<AlcoholEquivalent> drinks;
 }

@@ -1,8 +1,9 @@
 package com.example.demo.service;
 
+import com.example.demo.AlcoholEquivalent;
 import com.example.demo.CombinationVariant;
 import com.example.demo.Constants;
-import com.example.demo.DrinkEquivalent;
+import com.example.demo.AlcoholEquivalent;
 import com.example.demo.dto.AlcoholCalculationRequest;
 import com.example.demo.dto.AlcoholCalculationResponse;
 import com.example.demo.entity.Alcohol;
@@ -15,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -78,7 +78,6 @@ public class AlcoholCalculationService {
         // 5. Расчёт массы чистого спирта
         double userConst = Optional.ofNullable(user.getPersonalConst()).orElse(0.0);
         double adjustedPromille = request.getDesiredPromille() + userConst;
-
         double pureAlcoholGrams = Math.max(0, adjustedPromille)
                 * request.getWeight()
                 * r
@@ -103,7 +102,6 @@ public class AlcoholCalculationService {
         return new AlcoholCalculationResponse(roundedGrams, variants);
     }
 
-    // Округление до "красивого" значения
     private double roundToNiceValue(double ml) {
         if (ml < 10) {
             // Для маленьких объемов оставляем 1 знак после запятой
@@ -117,22 +115,20 @@ public class AlcoholCalculationService {
         }
     }
 
-    // Компенсация разницы в количестве спирта
-    private void compensateDifference(List<DrinkEquivalent> equivalents, double diff,
+    private void compensateDifference(List<AlcoholEquivalent> equivalents, double diff,
                                       Map<String, Double> drinkStrengthMap) {
         if (equivalents.isEmpty()) return;
 
         // Находим напиток с максимальной крепостью для минимальной коррекции
-        DrinkEquivalent strongestDrink = null;
+        AlcoholEquivalent strongestDrink = null;
         double maxStrength = 0;
-        for (DrinkEquivalent eq : equivalents) {
-            double strength = drinkStrengthMap.getOrDefault(eq.getDrinkName(), 40.0);
+        for (AlcoholEquivalent eq : equivalents) {
+            double strength = drinkStrengthMap.getOrDefault(eq.getName(), 40.0);
             if (strength > maxStrength) {
                 maxStrength = strength;
                 strongestDrink = eq;
             }
         }
-
         if (strongestDrink == null) return;
 
         double strength = maxStrength;
@@ -151,17 +147,17 @@ public class AlcoholCalculationService {
         log.debug("Creating variant with {}g alcohol for {} drinks", alcoholGrams, drinks.size());
 
         double portion = alcoholGrams / drinks.size();
-        List<DrinkEquivalent> equivalents = drinks.stream()
+        List<AlcoholEquivalent> equivalents = drinks.stream()
                 .map(drink -> {
                     double exactMl = (portion * 100) / (drink.getDegree() * Constants.ETHANOL_DENSITY);
-                    return new DrinkEquivalent(drink.getName(), exactMl);
+                    return new AlcoholEquivalent(drink.getAlcoholId(), drink.getName(), exactMl);
                 })
                 .collect(Collectors.toList());
 
         // Рассчитываем общее количество спирта для проверки
         double totalAlcohol = equivalents.stream()
                 .mapToDouble(eq -> {
-                    double strength = drinkStrengthMap.getOrDefault(eq.getDrinkName(), 40.0);
+                    double strength = drinkStrengthMap.getOrDefault(eq.getName(), 40.0);
                     return eq.getMl() * (strength / 100) * Constants.ETHANOL_DENSITY;
                 })
                 .sum();
@@ -175,7 +171,7 @@ public class AlcoholCalculationService {
         // Корректируем для сохранения общего количества спирта
         double newTotalAlcohol = equivalents.stream()
                 .mapToDouble(eq -> {
-                    double strength = drinkStrengthMap.getOrDefault(eq.getDrinkName(), 40.0);
+                    double strength = drinkStrengthMap.getOrDefault(eq.getName(), 40.0);
                     return eq.getMl() * (strength / 100) * Constants.ETHANOL_DENSITY;
                 })
                 .sum();

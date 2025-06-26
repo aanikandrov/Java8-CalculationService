@@ -3,7 +3,7 @@ package com.example.demo;
 public class Constants {
 
     // Количество возвращаемых вариантов
-    static final public int MAX_VARIANTS = 7;
+    static final public int MAX_VARIANTS = 15;
 
     // Макс напитков в комбинации
     static final public int MAX_DRINKS_PER_VARIANT = 3;

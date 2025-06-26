@@ -15,15 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public User getUserWithPersonalConst(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.error("User not found with id: {}", userId);
-                    return new EntityNotFoundException("User not found with id: " + userId);
-                });
-    }
-
+    @Transactional
     public void updatePersonalConst(FeedbackRequest request) {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> {

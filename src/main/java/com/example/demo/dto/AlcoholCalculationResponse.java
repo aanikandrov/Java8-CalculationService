@@ -1,7 +1,7 @@
 package com.example.demo.dto;
 
 import com.example.demo.CombinationVariant;
-import com.example.demo.DrinkEquivalent;
+import com.example.demo.AlcoholEquivalent;
 import lombok.Getter;
 import lombok.Setter;
 
