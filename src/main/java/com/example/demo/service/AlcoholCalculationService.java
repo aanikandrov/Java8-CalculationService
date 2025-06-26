@@ -182,19 +182,6 @@ public class AlcoholCalculationService {
             }
         }
 
-        if (variants.size() < maxVariants) {
-            log.debug("Only {} variants generated, adding single-drink variants", variants.size());
-            for (Alcohol drink : drinks) {
-                if (variants.size() >= maxVariants) break;
-                Set<String> key = Set.of(drink.getName());
-                if (!seenCombinations.contains(key)) {
-                    log.debug("Adding single-drink variant: {}", drink.getName());
-                    variants.add(createVariant(alcoholGrams, List.of(drink)));
-                    seenCombinations.add(key);
-                }
-            }
-        }
-
         log.info("Total variants generated: {}", variants.size());
         return variants.stream().limit(maxVariants).collect(Collectors.toList());
     }
