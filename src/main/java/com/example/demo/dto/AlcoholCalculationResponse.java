@@ -1,7 +1,6 @@
 package com.example.demo.dto;
 
-import com.example.demo.CombinationVariant;
-import com.example.demo.AlcoholEquivalent;
+import com.example.demo.utils.CombinationVariant;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,13 +1,12 @@
 package com.example.demo.service;
 
-import com.example.demo.AlcoholEquivalent;
-import com.example.demo.CombinationVariant;
-import com.example.demo.Constants;
-import com.example.demo.AlcoholEquivalent;
-import com.example.demo.dto.AlcoholCalculationRequest;
-import com.example.demo.dto.AlcoholCalculationResponse;
 import com.example.demo.entity.Alcohol;
 import com.example.demo.entity.User;
+import com.example.demo.utils.AlcoholEquivalent;
+import com.example.demo.utils.CombinationVariant;
+import com.example.demo.constants.Constants;
+import com.example.demo.dto.AlcoholCalculationRequest;
+import com.example.demo.dto.AlcoholCalculationResponse;
 import com.example.demo.repository.AlcoholRepository;
 import com.example.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
