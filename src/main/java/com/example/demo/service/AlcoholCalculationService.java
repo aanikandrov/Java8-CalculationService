@@ -183,7 +183,6 @@ public class AlcoholCalculationService {
         return new CombinationVariant(equivalents);
     }
 
-    // Остальные методы без изменений
     private void generateCombinations(
             List<CombinationVariant> variants,
             Set<Set<String>> seenCombinations,
