@@ -92,7 +92,7 @@ public class AlcoholCalculationService {
                 roundedGrams,
                 availableDrinks,
                 Constants.MAX_VARIANTS,
-                drinkStrengthMap  // Передаем карту крепостей
+                drinkStrengthMap  
         );
 
         log.info("Generated {} combination variants:", variants.size());
