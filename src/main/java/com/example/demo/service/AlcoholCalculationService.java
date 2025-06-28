@@ -38,7 +38,7 @@ public class AlcoholCalculationService {
 
         List<Alcohol> availableDrinks = new ArrayList<>(allDrinks);
 
-        // Создаем карту для быстрого доступа к крепости напитка по имени
+        // Создаем хэшмапу для быстрого доступа к крепости напитка по имени
         Map<String, Double> drinkStrengthMap = availableDrinks.stream()
                 .collect(Collectors.toMap(Alcohol::getName, Alcohol::getDegree));
 
